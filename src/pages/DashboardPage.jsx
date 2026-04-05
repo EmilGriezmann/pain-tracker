@@ -49,7 +49,7 @@ const ALL_CATEGORIES = [
   { id: 'abdomen', label: 'Unterleibsschmerzen' },
 ]
 
-function CategoryCard({ id, label, entry, date, onSaved }) {
+function CategoryCard({ id, label, entry, date, isToday, onSaved }) {
   const { saveEntry } = useEntries()
   const color = CATEGORY_COLORS[id].primary
 
@@ -140,8 +140,8 @@ function CategoryCard({ id, label, entry, date, onSaved }) {
         </div>
       )}
 
-      {/* EOD — inline */}
-      <div className="px-4 pt-2 pb-4 border-t border-gray-100 flex flex-col gap-4">
+      {/* EOD — inline (nur für vergangene Tage) */}
+      {!isToday && <div className="px-4 pt-2 pb-4 border-t border-gray-100 flex flex-col gap-4">
 
         {/* Gesamtschmerz */}
         <div>
@@ -209,7 +209,7 @@ function CategoryCard({ id, label, entry, date, onSaved }) {
         >
           {savingEod ? 'Speichern…' : savedEod ? 'Gespeichert ✓' : 'Abend-Eintrag speichern'}
         </button>
-      </div>
+      </div>}
     </div>
   )
 }
@@ -291,6 +291,7 @@ export default function DashboardPage() {
           label={label}
           entry={entries[id]}
           date={date}
+          isToday={isToday}
           onSaved={loadEntries}
         />
       ))}
