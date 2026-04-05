@@ -1,6 +1,6 @@
 # Pain Tracker — Aktueller Stand
 
-Zuletzt aktualisiert: 2026-04-05
+Zuletzt aktualisiert: 2026-04-06
 
 ---
 
@@ -23,7 +23,6 @@ Zuletzt aktualisiert: 2026-04-05
 - `src/index.css` auf Tailwind-Basis gesetzt
 - Ordnerstruktur angelegt: `src/lib/`, `src/pages/`
 - `src/lib/supabase.js` — Supabase-Client
-- Dev-Server läuft auf `http://localhost:5173`
 
 ### Schritt 3 — Auth
 - `src/hooks/useAuth.js` — Session-Persistenz via Supabase localStorage, `login()` / `logout()`
@@ -33,51 +32,64 @@ Zuletzt aktualisiert: 2026-04-05
 
 ### Schritt 4 — Tagesverlauf (Canvas)
 - `src/components/PainCanvas.jsx` — HiDPI-Canvas (devicePixelRatio), 24 diskrete Stunden-Spalten (X), Integer-Snapping Y (0–10), ein Swipe setzt alle durchfahrenen Stunden
-- `src/hooks/useEntries.js` — `loadEntry` / `saveEntry` / `loadAllEntries` via Supabase
+- `src/hooks/useEntries.js` — `loadEntry` / `saveEntry` / `loadAllEntries` / `loadEntriesInRange` via Supabase
 - `src/pages/TrackingPage.jsx` — Tabs Kopf/Unterbauch, Kurve laden/speichern
 - Route `/tracking` in App.jsx
 
 ### Schritt 5 — End-of-Day Formular
-- `src/components/MultipleChoice.jsx` — Mehrfach- und Einfachauswahl
-- `src/pages/EODFormPage.jsx` — 4-Schritt-Wizard (Gesamtschmerz, Ort, Charakter, Begleitsymptome), Tabs Kopf/Unterbauch, Speichern via Supabase
-- Begleitsymptome-Optionen noch nicht definiert (Platzhalter-Text in Schritt 4)
+- `src/components/MultipleChoice.jsx` — Mehrfach- und Einfachauswahl, `color`-Prop
+- `src/pages/EODFormPage.jsx` — 4-Schritt-Wizard (Gesamtschmerz, Ort, Charakter, Begleitsymptome), Tabs Kopf/Unterbauch
+- Begleitsymptome-Optionen noch nicht definiert (→ Schritt 12)
 - Route `/eod` in App.jsx
 
 ### Schritt 6 — Dashboard & UX
-- `src/pages/DashboardPage.jsx` — Tagesansicht, datums-flexibel via `/day/:date`, heute via `/today`
+- `src/pages/DashboardPage.jsx` — Tagesansicht, datums-flexibel
+  - Heute: Canvas editierbar, kein EOD-Inline
+  - Vergangene Tage: Canvas editierbar + EOD inline (Gesamtschmerz, Ort, Charakter, Begleitsymptome direkt anklickbar)
+  - Vor/Zurück-Navigation zwischen Tagen
 - `src/components/NavBar.jsx` — Bottom Navigation (Verlauf / Heute / Abend)
-- NavBar in alle Seiten eingebunden
+- Routing: `/today`, `/day/:date`, `/day/:date/:category`
 
 ### Schritt 7 — PWA & Deployment
 - Icons erstellt: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`
 - `.npmrc` mit `legacy-peer-deps=true` für Vercel-Kompatibilität
 - GitHub-Repository: https://github.com/EmilGriezmann/pain-tracker
 - Vercel-Deployment aktiv (automatische Deploys bei Push auf `main`)
-- Canvas: kein Rahmen, volle Breite, Aspect Ratio 1:1
 
 ### Schritt 8 — Verlaufs-Homepage (Schmerzkalender)
 - `src/pages/HistoryPage.jsx` — neue Homepage (`/`)
 - Zwei Heatmap-Blöcke: Kopfschmerzen (Rotskala) + Unterleibsschmerzen (Violettskala)
-- Kompaktansicht: letzte 30 Tage als 10×3-Grid, füllt Kartenbreite
-- Erweiterte Ansicht: monatlicher Kalender (Mo–So), Monats-/Jahresüberschriften, per Kategorie unabhängig ausklappbar
-- Tap auf Kästchen → öffnet Tagesansicht (`/day/:date`)
-- Routing: `/` → HistoryPage, `/today` → DashboardPage, `/day/:date` → DashboardPage
-- Test-Seed-Script: `scripts/seed-test-user.js` (testpatient@example.com)
+- Kompaktansicht: letzte 30 Tage als 10×3-Grid
+- Erweiterte Ansicht: monatlicher Kalender (Mo–So) mit Monats-/Jahresüberschriften, per Kategorie ausklappbar
+- Tap auf Kästchen → öffnet kategoriespezifische Tagesansicht (`/day/:date/:category`)
+
+### Schritt 9 — Statistik-Seiten
+- `src/pages/StatsPage.jsx` — Route `/stats/:category`
+- Zeitraum-Selector: 7 / 30 / 90 Tage
+- Häufigkeitslisten für Ort, Charakter, Begleitsymptome (Balken relativ zum Zeitraum)
+- Einstiegskarten auf HistoryPage
+
+### Schritt 10 — Farbthemen
+- `src/lib/colors.js` — zentrale Farbkonfiguration (Kopf = rot, Unterbauch = violett)
+- Farben in PainCanvas, TrackingPage, DashboardPage, StatsPage, EODFormPage, MultipleChoice übernommen
 
 ---
 
 ## Offene Schritte
 
-### Schritt 9 — Statistik-Karten auf der Verlaufs-Homepage
-Unter den zwei Heatmap-Blöcken: 4 kleinere Karten (je halbe Breite, 2×2), jede mit Kopf/Unterbauch-Tab:
-- **Gesamtschmerz** — Grafik-Typ noch offen (kommt vom Nutzer)
-- **Ort** — Grafik-Typ noch offen
-- **Charakter** — Grafik-Typ noch offen
-- **Begleitsymptome** — Grafik-Typ noch offen
+### Schritt 12 — Begleitsymptome (nächste Session)
+
+**12a — Standard-Optionen definieren**
+- Symptom-Optionen für Kopf und Unterbauch vom Nutzer durchgeben lassen
+- In drei Dateien eintragen: `EODFormPage.jsx`, `DashboardPage.jsx`, `StatsPage.jsx`
+
+**12b — Eigene Symptome anlegen**
+- Nutzer kann eigene Begleitsymptome erstellen
+- Erscheinen in EOD-Eingabe und Statistiken
+- Gespeichert in neuer Supabase-Tabelle `user_symptoms` (user_id, category, value, label)
 
 ### Weitere offene Punkte
-- [ ] Begleitsymptome-Optionen definieren (Kopf + Unterbauch) — aktuell Platzhalter im EOD-Formular
-- [ ] Design-Schritt (Farben, Schrift, App-Name)
+- [ ] Design-Schritt (App-Name, Schrift, Feintuning)
 
 ---
 
@@ -88,32 +100,33 @@ sarah_app/
 ├── public/
 │   ├── favicon.svg
 │   ├── icon-512.jpg
-│   ├── icons.svg
 │   └── icons/
 │       ├── apple-touch-icon.png  (180×180)
 │       ├── icon-192.png          (192×192)
 │       └── icon-512.png          (512×512)
 ├── scripts/
-│   └── seed-test-user.js         # Testdaten-Generator
+│   └── seed-test-user.js         # Testdaten-Generator (lokal, nicht im Repo)
 ├── src/
 │   ├── main.jsx
 │   ├── App.jsx                   # Router + Auth-Guard
 │   ├── index.css
 │   ├── lib/
-│   │   └── supabase.js
+│   │   ├── supabase.js
+│   │   └── colors.js             # Kategorie-Farbkonfiguration
 │   ├── hooks/
 │   │   ├── useAuth.js
 │   │   └── useEntries.js
 │   ├── components/
-│   │   ├── PainCanvas.jsx
-│   │   ├── MultipleChoice.jsx
+│   │   ├── PainCanvas.jsx        # color-Prop
+│   │   ├── MultipleChoice.jsx    # color-Prop
 │   │   └── NavBar.jsx
 │   └── pages/
 │       ├── LoginPage.jsx
-│       ├── HistoryPage.jsx       # Homepage — Schmerzkalender
-│       ├── DashboardPage.jsx     # Tagesansicht (heute oder Datum)
+│       ├── HistoryPage.jsx       # Homepage — Schmerzkalender + Statistik-Einstieg
+│       ├── DashboardPage.jsx     # Tagesansicht (inline editierbar)
 │       ├── TrackingPage.jsx
-│       └── EODFormPage.jsx
+│       ├── EODFormPage.jsx
+│       └── StatsPage.jsx         # Häufigkeitsstatistiken pro Kategorie
 ├── KONZEPT.md
 ├── STATUS.md
 ├── CLAUDE.md
@@ -130,6 +143,6 @@ sarah_app/
 
 - `vite-plugin-pwa` mit `--legacy-peer-deps` / `.npmrc` (Vite 8 Kompatibilitätsproblem)
 - Null-Slots (nicht gezeichnete Stunden) werden nicht gespeichert; Wert 0 wird gespeichert — korrekt unterschieden
-- Grau in den Heatmaps = kein Eintrag (nicht vergessen vs. 0 ist unterscheidbar durch Farbe)
+- Grau in den Heatmaps = kein Eintrag; leichtestes Rot/Violett = Schmerz 1
 - Account-Erstellung nur über Supabase Dashboard
 - Testaccount: testpatient@example.com / Test1234!
