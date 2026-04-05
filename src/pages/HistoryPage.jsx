@@ -3,33 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import { useEntries } from '../hooks/useEntries'
 
-// Farb-Skalen: 0 = kein Eintrag (grau), 1–10 = Intensität
 const HEAD_COLORS = [
-  '#e5e7eb', // kein Eintrag
-  '#fee2e2', // 1
-  '#fecaca', // 2
-  '#fca5a5', // 3
-  '#f87171', // 4
-  '#ef4444', // 5
-  '#dc2626', // 6
-  '#b91c1c', // 7
-  '#991b1b', // 8
-  '#7f1d1d', // 9
-  '#450a0a', // 10
+  '#e5e7eb',
+  '#fee2e2', '#fecaca', '#fca5a5', '#f87171', '#ef4444',
+  '#dc2626', '#b91c1c', '#991b1b', '#7f1d1d', '#450a0a',
 ]
-
 const ABDOMEN_COLORS = [
-  '#e5e7eb', // kein Eintrag
-  '#f3e8ff', // 1
-  '#e9d5ff', // 2
-  '#d8b4fe', // 3
-  '#c084fc', // 4
-  '#a855f7', // 5
-  '#9333ea', // 6
-  '#7e22ce', // 7
-  '#6b21a8', // 8
-  '#581c87', // 9
-  '#3b0764', // 10
+  '#e5e7eb',
+  '#f3e8ff', '#e9d5ff', '#d8b4fe', '#c084fc', '#a855f7',
+  '#9333ea', '#7e22ce', '#6b21a8', '#581c87', '#3b0764',
 ]
 
 function getColor(pain, colors) {
@@ -37,81 +19,133 @@ function getColor(pain, colors) {
   return colors[Math.max(1, Math.min(10, pain))]
 }
 
-// Gibt alle Tage der letzten N Wochen zurück (Montag-Start)
-function getWeekGrid(weeks) {
+function getLastNDays(n) {
+  const days = []
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-
-  // Gehe zurück zum letzten Montag
-  const dayOfWeek = (today.getDay() + 6) % 7 // 0=Mo, 6=So
-  const start = new Date(today)
-  start.setDate(today.getDate() - dayOfWeek - (weeks - 1) * 7)
-
-  const days = []
-  const cur = new Date(start)
-  while (cur <= today) {
-    days.push(cur.toISOString().slice(0, 10))
-    cur.setDate(cur.getDate() + 1)
+  for (let i = n - 1; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(today.getDate() - i)
+    days.push(d.toISOString().slice(0, 10))
   }
   return days
 }
 
-// Gruppiert Tage in Wochen (Arrays von je 7)
-function toWeeks(days) {
-  const weeks = []
-  for (let i = 0; i < days.length; i += 7) {
-    weeks.push(days.slice(i, i + 7))
+function getMonthsInRange(startMonthStr, endMonthStr) {
+  const months = []
+  const cur = new Date(startMonthStr + '-01')
+  const end = new Date(endMonthStr + '-01')
+  while (cur <= end) {
+    months.push(cur.toISOString().slice(0, 7))
+    cur.setMonth(cur.getMonth() + 1)
   }
-  return weeks
+  return months
 }
 
+const MONTH_NAMES = [
+  'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+  'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember',
+]
 const DAY_LABELS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So']
 
-function HeatmapGrid({ days, dataByDate, colors, onDayPress }) {
-  const weeks = toWeeks(days)
+// Kompaktansicht: letzte 30 Tage, 10 Spalten, füllt Kartenbreite
+function CompactGrid({ dataByDate, colors, onDayPress }) {
+  const days = getLastNDays(30)
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="flex flex-col gap-1">
-      {/* Wochentag-Labels oben */}
-      <div className="flex gap-1">
-        {DAY_LABELS.map(d => (
-          <div key={d} className="w-8 text-center text-[10px] text-gray-400">{d}</div>
-        ))}
-      </div>
-
-      {/* Zeilen = Wochen */}
-      {weeks.map((week, wi) => (
-        <div key={wi} className="flex gap-1">
-          {week.map(date => {
-            const pain = dataByDate[date] ?? null
-            const color = getColor(pain, colors)
-            const isToday = date === today
-            return (
-              <button
-                key={date}
-                onClick={() => onDayPress(date)}
-                style={{ backgroundColor: color }}
-                className={`w-8 h-8 rounded-md flex-shrink-0 ${isToday ? 'ring-2 ring-offset-1 ring-gray-400' : ''}`}
-                title={date}
-              />
-            )
-          })}
-        </div>
-      ))}
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)', gap: '5px', width: '100%' }}>
+      {days.map(date => {
+        const pain = dataByDate[date] ?? null
+        const color = getColor(pain, colors)
+        const isToday = date === today
+        return (
+          <button
+            key={date}
+            onClick={() => onDayPress(date)}
+            style={{ backgroundColor: color, aspectRatio: '1', borderRadius: '6px' }}
+            className={isToday ? 'ring-2 ring-offset-1 ring-gray-400' : ''}
+          />
+        )
+      })}
     </div>
   )
 }
 
-const PREVIEW_WEEKS = 4
+// Erweiterte Ansicht: nach Monat gegliedert, 7-Spalten-Kalender mit Monats-/Jahresüberschriften
+function ExpandedGrid({ dataByDate, colors, onDayPress, earliestDate }) {
+  const today = new Date().toISOString().slice(0, 10)
+  const startMonth = (earliestDate ?? today).slice(0, 7)
+  const endMonth = today.slice(0, 7)
+  const months = getMonthsInRange(startMonth, endMonth)
 
-function CategoryBlock({ label, days, dataByDate, colors, onDayPress }) {
+  return (
+    <div className="w-full flex flex-col gap-5">
+      {months.map((monthStr, mi) => {
+        const [year, month] = monthStr.split('-').map(Number)
+        const firstDay = new Date(year, month - 1, 1)
+        const daysInMonth = new Date(year, month, 0).getDate()
+        const startOffset = (firstDay.getDay() + 6) % 7 // 0=Mo
+
+        const cells = [
+          ...Array(startOffset).fill(null),
+          ...Array.from({ length: daysInMonth }, (_, i) => {
+            const d = i + 1
+            return `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+          }),
+        ]
+
+        const prevMonth = mi > 0 ? months[mi - 1] : null
+        const showYear = !prevMonth || prevMonth.slice(0, 4) !== String(year)
+
+        return (
+          <div key={monthStr}>
+            {/* Überschriften */}
+            <div className="mb-2">
+              {showYear && (
+                <p className="text-[11px] text-gray-400 font-medium mb-0.5">{year}</p>
+              )}
+              <p className="text-sm font-semibold text-gray-700">{MONTH_NAMES[month - 1]}</p>
+            </div>
+
+            {/* Wochentag-Labels */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
+              {DAY_LABELS.map(d => (
+                <div key={d} style={{ textAlign: 'center', fontSize: '10px', color: '#9ca3af' }}>{d}</div>
+              ))}
+            </div>
+
+            {/* Tages-Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+              {cells.map((date, i) => {
+                if (!date) return <div key={i} />
+                const isFuture = date > today
+                const pain = dataByDate[date] ?? null
+                const color = isFuture ? 'transparent' : getColor(pain, colors)
+                const isToday = date === today
+                return (
+                  <button
+                    key={date}
+                    onClick={() => !isFuture && onDayPress(date)}
+                    disabled={isFuture}
+                    style={{ backgroundColor: color, aspectRatio: '1', borderRadius: '6px' }}
+                    className={isToday ? 'ring-2 ring-offset-1 ring-gray-400' : ''}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function CategoryBlock({ label, dataByDate, colors, onDayPress, earliestDate }) {
   const [expanded, setExpanded] = useState(false)
-  const visibleDays = getWeekGrid(expanded ? 52 : PREVIEW_WEEKS)
 
   return (
     <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-      {/* Titelzeile — anklickbar zum Ausklappen */}
       <button
         onClick={() => setExpanded(e => !e)}
         className="w-full flex items-center justify-between px-4 pt-4 pb-3"
@@ -120,14 +154,21 @@ function CategoryBlock({ label, days, dataByDate, colors, onDayPress }) {
         <span className="text-xs text-gray-400">{expanded ? '▲' : '▼'}</span>
       </button>
 
-      {/* Grid — zentriert, Rahmen passt zum Inhalt */}
-      <div className="flex justify-center px-3 pb-4">
-        <HeatmapGrid
-          days={visibleDays}
-          dataByDate={dataByDate}
-          colors={colors}
-          onDayPress={onDayPress}
-        />
+      <div className="px-4 pb-4">
+        {expanded ? (
+          <ExpandedGrid
+            dataByDate={dataByDate}
+            colors={colors}
+            onDayPress={onDayPress}
+            earliestDate={earliestDate}
+          />
+        ) : (
+          <CompactGrid
+            dataByDate={dataByDate}
+            colors={colors}
+            onDayPress={onDayPress}
+          />
+        )}
       </div>
     </div>
   )
@@ -149,9 +190,11 @@ export default function HistoryPage() {
     }
   })
 
+  const allDates = entries.map(e => e.date).sort()
+  const earliest = allDates[0] ?? null
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-24">
-      {/* Header */}
       <div className="px-4 pt-12 pb-4">
         <p className="text-xs text-gray-400 uppercase tracking-wide">Verlauf</p>
         <h1 className="text-lg font-semibold text-gray-800">Schmerzkalender</h1>
@@ -162,6 +205,7 @@ export default function HistoryPage() {
         dataByDate={dataByCategory.head}
         colors={HEAD_COLORS}
         onDayPress={date => navigate(`/day/${date}`)}
+        earliestDate={earliest}
       />
 
       <CategoryBlock
@@ -169,6 +213,7 @@ export default function HistoryPage() {
         dataByDate={dataByCategory.abdomen}
         colors={ABDOMEN_COLORS}
         onDayPress={date => navigate(`/day/${date}`)}
+        earliestDate={earliest}
       />
 
       <NavBar />
