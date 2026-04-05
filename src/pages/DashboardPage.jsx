@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useEntries } from '../hooks/useEntries'
 import PainCanvas from '../components/PainCanvas'
 import NavBar from '../components/NavBar'
+import { CATEGORY_COLORS } from '../lib/colors'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -115,7 +116,7 @@ export default function DashboardPage() {
 
             {hasCurve ? (
               <div className="px-3 pb-3">
-                <PainCanvas initialData={entry.curve_data} readOnly />
+                <PainCanvas initialData={entry.curve_data} readOnly color={CATEGORY_COLORS[id].primary} />
               </div>
             ) : (
               <div className="px-4 pb-3">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../components/NavBar'
 import { useEntries } from '../hooks/useEntries'
+import { CATEGORY_COLORS } from '../lib/colors'
 
 const LABELS = {
   location: {
@@ -37,7 +38,7 @@ function countValues(entries, field, labelMap) {
     .sort((a, b) => b[1] - a[1])
 }
 
-function FrequencySection({ title, counts, period }) {
+function FrequencySection({ title, counts, period, color }) {
 
   if (counts.length === 0) {
     return (
@@ -57,8 +58,8 @@ function FrequencySection({ title, counts, period }) {
             <span className="text-sm text-gray-600 w-36 flex-shrink-0">{label}</span>
             <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
-                className="h-2 rounded-full bg-indigo-400"
-                style={{ width: `${(count / period) * 100}%` }}
+                className="h-2 rounded-full"
+                style={{ width: `${(count / period) * 100}%`, backgroundColor: color }}
               />
             </div>
             <span className="text-sm text-gray-500 w-6 text-right flex-shrink-0">{count}</span>
@@ -77,6 +78,7 @@ export default function StatsPage() {
   const [entries, setEntries] = useState([])
 
   const categoryLabel = category === 'head' ? 'Kopfschmerzen' : 'Unterleibsschmerzen'
+  const color = CATEGORY_COLORS[category].primary
   const labelMap = LABELS
 
   useEffect(() => {
@@ -118,9 +120,9 @@ export default function StatsPage() {
         <p className="text-xs text-gray-400 mb-4">
           {entries.length} Einträge in den letzten {period} Tagen
         </p>
-        <FrequencySection title="Ort" counts={locationCounts} period={period} />
-        <FrequencySection title="Charakter" counts={characterCounts} period={period} />
-        <FrequencySection title="Begleitsymptome" counts={symptomCounts} period={period} />
+        <FrequencySection title="Ort" counts={locationCounts} period={period} color={color} />
+        <FrequencySection title="Charakter" counts={characterCounts} period={period} color={color} />
+        <FrequencySection title="Begleitsymptome" counts={symptomCounts} period={period} color={color} />
       </div>
 
       <NavBar />

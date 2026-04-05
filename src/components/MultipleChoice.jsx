@@ -1,4 +1,4 @@
-export default function MultipleChoice({ options, selected, onChange, multi = true }) {
+export default function MultipleChoice({ options, selected, onChange, multi = true, color = '#6366f1' }) {
   function toggle(value) {
     if (multi) {
       if (selected.includes(value)) {
@@ -20,10 +20,9 @@ export default function MultipleChoice({ options, selected, onChange, multi = tr
             key={value}
             type="button"
             onClick={() => toggle(value)}
+            style={active ? { backgroundColor: color, borderColor: color } : {}}
             className={`w-full text-left px-4 py-3 rounded-xl border text-sm font-medium transition-colors ${
-              active
-                ? 'bg-indigo-500 border-indigo-500 text-white'
-                : 'bg-white border-gray-200 text-gray-700'
+              active ? 'text-white' : 'bg-white border-gray-200 text-gray-700'
             }`}
           >
             {label}

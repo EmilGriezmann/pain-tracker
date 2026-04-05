@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import PainCanvas from '../components/PainCanvas'
 import NavBar from '../components/NavBar'
 import { useEntries } from '../hooks/useEntries'
+import { CATEGORY_COLORS } from '../lib/colors'
 
 const CATEGORIES = [
   { id: 'head', label: 'Kopf' },
@@ -83,6 +84,7 @@ export default function TrackingPage() {
           key={category}
           initialData={savedData[category] ?? []}
           onChange={setCurveData}
+          color={CATEGORY_COLORS[category].primary}
         />
       </div>
 

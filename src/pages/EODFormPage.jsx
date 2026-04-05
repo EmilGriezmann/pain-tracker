@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import MultipleChoice from '../components/MultipleChoice'
 import NavBar from '../components/NavBar'
 import { useEntries } from '../hooks/useEntries'
+import { CATEGORY_COLORS } from '../lib/colors'
 
 const CATEGORIES = [
   { id: 'head', label: 'Kopf' },
@@ -76,6 +77,7 @@ export default function EODFormPage() {
   }, [category])
 
   const form = forms[category]
+  const color = CATEGORY_COLORS[category].primary
 
   function setField(field, value) {
     setForms(prev => ({
@@ -136,9 +138,8 @@ export default function EODFormPage() {
         {STEPS.map((_, i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-colors ${
-              i <= step ? 'bg-indigo-500' : 'bg-gray-200'
-            }`}
+            className="h-1 flex-1 rounded-full transition-colors"
+            style={{ backgroundColor: i <= step ? color : '#e5e7eb' }}
           />
         ))}
       </div>
@@ -162,10 +163,9 @@ export default function EODFormPage() {
                   key={i}
                   type="button"
                   onClick={() => setField('overall_pain', i)}
+                  style={form.overall_pain === i ? { backgroundColor: color, borderColor: color } : {}}
                   className={`w-12 h-12 rounded-xl border text-sm font-semibold transition-colors ${
-                    form.overall_pain === i
-                      ? 'bg-indigo-500 border-indigo-500 text-white'
-                      : 'bg-white border-gray-200 text-gray-700'
+                    form.overall_pain === i ? 'text-white' : 'bg-white border-gray-200 text-gray-700'
                   }`}
                 >
                   {i}
@@ -182,6 +182,7 @@ export default function EODFormPage() {
             selected={form.location}
             onChange={v => setField('location', v)}
             multi={category === 'head'}
+            color={color}
           />
         )}
 
@@ -192,6 +193,7 @@ export default function EODFormPage() {
             selected={form.character}
             onChange={v => setField('character', v)}
             multi
+            color={color}
           />
         )}
 
@@ -226,7 +228,8 @@ export default function EODFormPage() {
           <button
             onClick={() => setStep(s => s + 1)}
             disabled={!canNext}
-            className="flex-1 bg-indigo-500 text-white rounded-xl py-3 font-medium disabled:opacity-40"
+            style={{ backgroundColor: color }}
+            className="flex-1 text-white rounded-xl py-3 font-medium disabled:opacity-40"
           >
             Weiter
           </button>
@@ -234,7 +237,8 @@ export default function EODFormPage() {
           <button
             onClick={handleSave}
             disabled={saving || form.overall_pain === null}
-            className="flex-1 bg-indigo-500 text-white rounded-xl py-3 font-medium disabled:opacity-40"
+            style={{ backgroundColor: color }}
+            className="flex-1 text-white rounded-xl py-3 font-medium disabled:opacity-40"
           >
             {saving ? 'Speichern…' : saved ? 'Gespeichert ✓' : 'Speichern'}
           </button>

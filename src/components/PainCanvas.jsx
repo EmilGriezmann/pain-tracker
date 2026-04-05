@@ -79,14 +79,14 @@ function drawGrid(ctx, drawW, drawH) {
   ctx.restore()
 }
 
-function drawCurve(ctx, slots, drawW, drawH) {
+function drawCurve(ctx, slots, drawW, drawH, color = '#6366f1') {
   ctx.save()
   ctx.translate(PAD.left * DPR, PAD.top * DPR)
 
   const colW = drawW / HOURS
 
   // Verbindungslinie über gesetzte Punkte
-  ctx.strokeStyle = '#6366f1'
+  ctx.strokeStyle = color
   ctx.lineWidth = 2.5 * DPR
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
@@ -107,7 +107,7 @@ function drawCurve(ctx, slots, drawW, drawH) {
   if (started) ctx.stroke()
 
   // Punkte an gesetzten Stunden
-  ctx.fillStyle = '#6366f1'
+  ctx.fillStyle = color
   slots.forEach((intensity, hour) => {
     if (intensity === null) return
     const x = (hour + 0.5) * colW
@@ -120,7 +120,7 @@ function drawCurve(ctx, slots, drawW, drawH) {
   ctx.restore()
 }
 
-export default function PainCanvas({ initialData = [], onChange, readOnly = false }) {
+export default function PainCanvas({ initialData = [], onChange, readOnly = false, color = '#6366f1' }) {
   const canvasRef = useRef(null)
   const slotsRef = useRef(emptyHours())
   const drawing = useRef(false)
@@ -141,7 +141,7 @@ export default function PainCanvas({ initialData = [], onChange, readOnly = fals
     const { drawW, drawH } = getDrawSize()
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawGrid(ctx, drawW, drawH)
-    drawCurve(ctx, slotsRef.current, drawW, drawH)
+    drawCurve(ctx, slotsRef.current, drawW, drawH, color)
   }, [])
 
   useEffect(() => {
