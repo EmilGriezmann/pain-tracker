@@ -218,6 +218,26 @@ export default function HistoryPage() {
         earliestDate={earliest}
       />
 
+      {/* Statistik-Einstieg */}
+      <div className="mx-4 mb-4 flex flex-col gap-3">
+        {[
+          { category: 'head', label: 'Kopfschmerzen' },
+          { category: 'abdomen', label: 'Unterleibsschmerzen' },
+        ].map(({ category, label }) => (
+          <button
+            key={category}
+            onClick={() => navigate(`/stats/${category}`)}
+            className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 flex items-center justify-between"
+          >
+            <div className="text-left">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Statistik</p>
+              <p className="text-sm font-semibold text-gray-700">{label}</p>
+            </div>
+            <span className="text-gray-400 text-lg">›</span>
+          </button>
+        ))}
+      </div>
+
       <NavBar />
     </div>
   )

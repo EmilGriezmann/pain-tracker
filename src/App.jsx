@@ -5,6 +5,7 @@ import HistoryPage from './pages/HistoryPage'
 import DashboardPage from './pages/DashboardPage'
 import TrackingPage from './pages/TrackingPage'
 import EODFormPage from './pages/EODFormPage'
+import StatsPage from './pages/StatsPage'
 
 function RequireAuth({ children }) {
   const { user } = useAuth()
@@ -23,6 +24,7 @@ function App() {
         <Route path="/day/:date" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/tracking" element={<RequireAuth><TrackingPage /></RequireAuth>} />
         <Route path="/eod" element={<RequireAuth><EODFormPage /></RequireAuth>} />
+        <Route path="/stats/:category" element={<RequireAuth><StatsPage /></RequireAuth>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

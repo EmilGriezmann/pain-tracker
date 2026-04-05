@@ -23,6 +23,20 @@ export function useEntries() {
     if (error) throw error
   }
 
+  async function loadEntriesInRange(category, days) {
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - days)
+    const cutoffStr = cutoff.toISOString().slice(0, 10)
+    const { data, error } = await supabase
+      .from('daily_entries')
+      .select('date, location, character, symptoms')
+      .eq('category', category)
+      .gte('date', cutoffStr)
+      .order('date', { ascending: false })
+    if (error) throw error
+    return data ?? []
+  }
+
   async function loadAllEntries() {
     const { data, error } = await supabase
       .from('daily_entries')
@@ -32,5 +46,5 @@ export function useEntries() {
     return data ?? []
   }
 
-  return { loadEntry, saveEntry, loadAllEntries }
+  return { loadEntry, saveEntry, loadAllEntries, loadEntriesInRange }
 }
