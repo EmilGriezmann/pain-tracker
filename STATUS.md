@@ -33,7 +33,7 @@ Zuletzt aktualisiert: 2026-04-05
 
 ### Schritt 4 — Tagesverlauf (Canvas)
 - `src/components/PainCanvas.jsx` — HiDPI-Canvas (devicePixelRatio), 24 diskrete Stunden-Spalten (X), Integer-Snapping Y (0–10), ein Swipe setzt alle durchfahrenen Stunden
-- `src/hooks/useEntries.js` — `loadEntry` / `saveEntry` via Supabase upsert
+- `src/hooks/useEntries.js` — `loadEntry` / `saveEntry` / `loadAllEntries` via Supabase
 - `src/pages/TrackingPage.jsx` — Tabs Kopf/Unterbauch, Kurve laden/speichern
 - Route `/tracking` in App.jsx
 
@@ -44,24 +44,40 @@ Zuletzt aktualisiert: 2026-04-05
 - Route `/eod` in App.jsx
 
 ### Schritt 6 — Dashboard & UX
-- `src/pages/DashboardPage.jsx` — Datum, Status-Badges (Kurve / EOD), Kurven-Vorschau readonly, Quick-Action-Buttons, In-App-Erinnerung nach 18:00 Uhr
-- `src/components/NavBar.jsx` — Bottom Navigation (Heute / Verlauf / Abend)
-- NavBar in alle drei Seiten eingebunden
+- `src/pages/DashboardPage.jsx` — Tagesansicht, datums-flexibel via `/day/:date`, heute via `/today`
+- `src/components/NavBar.jsx` — Bottom Navigation (Verlauf / Heute / Abend)
+- NavBar in alle Seiten eingebunden
 
 ### Schritt 7 — PWA & Deployment
-- Icons erstellt: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png` (aus hochgeladenem JPG via sips)
+- Icons erstellt: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png`
 - `.npmrc` mit `legacy-peer-deps=true` für Vercel-Kompatibilität
-- GitHub-Repository angelegt: https://github.com/EmilGriezmann/pain-tracker
+- GitHub-Repository: https://github.com/EmilGriezmann/pain-tracker
 - Vercel-Deployment aktiv (automatische Deploys bei Push auf `main`)
-- Canvas-Größe angepasst: kein Rahmen, volle Breite, Aspect Ratio 1:1
+- Canvas: kein Rahmen, volle Breite, Aspect Ratio 1:1
+
+### Schritt 8 — Verlaufs-Homepage (Schmerzkalender)
+- `src/pages/HistoryPage.jsx` — neue Homepage (`/`)
+- Zwei Heatmap-Blöcke: Kopfschmerzen (Rotskala) + Unterleibsschmerzen (Violettskala)
+- Kompaktansicht: letzte 30 Tage als 10×3-Grid, füllt Kartenbreite
+- Erweiterte Ansicht: monatlicher Kalender (Mo–So), Monats-/Jahresüberschriften, per Kategorie unabhängig ausklappbar
+- Tap auf Kästchen → öffnet Tagesansicht (`/day/:date`)
+- Routing: `/` → HistoryPage, `/today` → DashboardPage, `/day/:date` → DashboardPage
+- Test-Seed-Script: `scripts/seed-test-user.js` (testpatient@example.com)
 
 ---
 
 ## Offene Schritte
 
-- [ ] Schritt 8 — Design (Farben, App-Icon, Schrift)
-- [ ] Begleitsymptome-Optionen definieren (Kopf + Unterbauch)
-- [ ] App auf iPhone als PWA installieren und Homescreen-Icon prüfen
+### Schritt 9 — Statistik-Karten auf der Verlaufs-Homepage
+Unter den zwei Heatmap-Blöcken: 4 kleinere Karten (je halbe Breite, 2×2), jede mit Kopf/Unterbauch-Tab:
+- **Gesamtschmerz** — Grafik-Typ noch offen (kommt vom Nutzer)
+- **Ort** — Grafik-Typ noch offen
+- **Charakter** — Grafik-Typ noch offen
+- **Begleitsymptome** — Grafik-Typ noch offen
+
+### Weitere offene Punkte
+- [ ] Begleitsymptome-Optionen definieren (Kopf + Unterbauch) — aktuell Platzhalter im EOD-Formular
+- [ ] Design-Schritt (Farben, Schrift, App-Name)
 
 ---
 
@@ -71,16 +87,18 @@ Zuletzt aktualisiert: 2026-04-05
 sarah_app/
 ├── public/
 │   ├── favicon.svg
-│   ├── icon-512.jpg          # Originalicon (hochgeladen)
+│   ├── icon-512.jpg
 │   ├── icons.svg
 │   └── icons/
-│       ├── apple-touch-icon.png  (180x180)
-│       ├── icon-192.png          (192x192)
-│       └── icon-512.png          (512x512)
+│       ├── apple-touch-icon.png  (180×180)
+│       ├── icon-192.png          (192×192)
+│       └── icon-512.png          (512×512)
+├── scripts/
+│   └── seed-test-user.js         # Testdaten-Generator
 ├── src/
 │   ├── main.jsx
-│   ├── App.jsx               # Router + Auth-Guard
-│   ├── index.css             # Tailwind
+│   ├── App.jsx                   # Router + Auth-Guard
+│   ├── index.css
 │   ├── lib/
 │   │   └── supabase.js
 │   ├── hooks/
@@ -92,7 +110,8 @@ sarah_app/
 │   │   └── NavBar.jsx
 │   └── pages/
 │       ├── LoginPage.jsx
-│       ├── DashboardPage.jsx
+│       ├── HistoryPage.jsx       # Homepage — Schmerzkalender
+│       ├── DashboardPage.jsx     # Tagesansicht (heute oder Datum)
 │       ├── TrackingPage.jsx
 │       └── EODFormPage.jsx
 ├── KONZEPT.md
@@ -109,6 +128,8 @@ sarah_app/
 
 ## Bekannte Besonderheiten
 
-- `vite-plugin-pwa` mit `--legacy-peer-deps` installiert (Vite 8 Kompatibilitätsproblem) — `.npmrc` sorgt dafür, dass Vercel dasselbe tut
-- Null-Slots (nicht gezeichnete Stunden) werden nicht gespeichert; Wert 0 wird explizit gespeichert — beides korrekt unterschieden
-- Account-Erstellung nur über Supabase Dashboard (kein öffentliches Registrierungsformular)
+- `vite-plugin-pwa` mit `--legacy-peer-deps` / `.npmrc` (Vite 8 Kompatibilitätsproblem)
+- Null-Slots (nicht gezeichnete Stunden) werden nicht gespeichert; Wert 0 wird gespeichert — korrekt unterschieden
+- Grau in den Heatmaps = kein Eintrag (nicht vergessen vs. 0 ist unterscheidbar durch Farbe)
+- Account-Erstellung nur über Supabase Dashboard
+- Testaccount: testpatient@example.com / Test1234!
