@@ -105,9 +105,36 @@ function HeatmapGrid({ days, dataByDate, colors, onDayPress }) {
 
 const PREVIEW_WEEKS = 4
 
+function CategoryBlock({ label, days, dataByDate, colors, onDayPress }) {
+  const [expanded, setExpanded] = useState(false)
+  const visibleDays = getWeekGrid(expanded ? 52 : PREVIEW_WEEKS)
+
+  return (
+    <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      {/* Titelzeile — anklickbar zum Ausklappen */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between px-4 pt-4 pb-3"
+      >
+        <h2 className="text-sm font-semibold text-gray-700">{label}</h2>
+        <span className="text-xs text-gray-400">{expanded ? '▲' : '▼'}</span>
+      </button>
+
+      {/* Grid — zentriert, Rahmen passt zum Inhalt */}
+      <div className="flex justify-center px-3 pb-4">
+        <HeatmapGrid
+          days={visibleDays}
+          dataByDate={dataByDate}
+          colors={colors}
+          onDayPress={onDayPress}
+        />
+      </div>
+    </div>
+  )
+}
+
 export default function HistoryPage() {
   const [entries, setEntries] = useState([])
-  const [expanded, setExpanded] = useState(false)
   const { loadAllEntries } = useEntries()
   const navigate = useNavigate()
 
@@ -115,20 +142,12 @@ export default function HistoryPage() {
     loadAllEntries().then(setEntries)
   }, [])
 
-  // Aufbau: { head: { '2026-04-01': 5, ... }, abdomen: { ... } }
   const dataByCategory = { head: {}, abdomen: {} }
   entries.forEach(({ date, category, overall_pain }) => {
     if (overall_pain !== null && overall_pain !== undefined) {
       dataByCategory[category][date] = overall_pain
     }
   })
-
-  // Zeitraum
-  const allDays = getWeekGrid(expanded ? 52 : PREVIEW_WEEKS)
-
-  // Frühestes Datum mit Eintrag ermitteln (für Info-Text)
-  const allDates = entries.map(e => e.date).sort()
-  const earliest = allDates[0]
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 pb-24">
@@ -138,37 +157,19 @@ export default function HistoryPage() {
         <h1 className="text-lg font-semibold text-gray-800">Schmerzkalender</h1>
       </div>
 
-      {/* Kopfschmerzen */}
-      <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-200 px-4 pt-4 pb-3 overflow-hidden">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Kopfschmerzen</h2>
-        <HeatmapGrid
-          days={allDays}
-          dataByDate={dataByCategory.head}
-          colors={HEAD_COLORS}
-          onDayPress={date => navigate(`/day/${date}`)}
-        />
-      </div>
+      <CategoryBlock
+        label="Kopfschmerzen"
+        dataByDate={dataByCategory.head}
+        colors={HEAD_COLORS}
+        onDayPress={date => navigate(`/day/${date}`)}
+      />
 
-      {/* Unterleibsschmerzen */}
-      <div className="mx-4 mb-4 bg-white rounded-2xl border border-gray-200 px-4 pt-4 pb-3 overflow-hidden">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Unterleibsschmerzen</h2>
-        <HeatmapGrid
-          days={allDays}
-          dataByDate={dataByCategory.abdomen}
-          colors={ABDOMEN_COLORS}
-          onDayPress={date => navigate(`/day/${date}`)}
-        />
-      </div>
-
-      {/* Ausklappen / Einklappen */}
-      <button
-        onClick={() => setExpanded(e => !e)}
-        className="mx-4 py-3 text-sm text-indigo-500 font-medium text-center"
-      >
-        {expanded
-          ? 'Weniger anzeigen'
-          : `Gesamten Zeitraum anzeigen${earliest ? ` (ab ${earliest})` : ''}`}
-      </button>
+      <CategoryBlock
+        label="Unterleibsschmerzen"
+        dataByDate={dataByCategory.abdomen}
+        colors={ABDOMEN_COLORS}
+        onDayPress={date => navigate(`/day/${date}`)}
+      />
 
       <NavBar />
     </div>
