@@ -22,6 +22,7 @@ function App() {
         <Route path="/" element={<RequireAuth><HistoryPage /></RequireAuth>} />
         <Route path="/today" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/day/:date" element={<RequireAuth><DashboardPage /></RequireAuth>} />
+        <Route path="/day/:date/:category" element={<RequireAuth><DashboardPage /></RequireAuth>} />
         <Route path="/tracking" element={<RequireAuth><TrackingPage /></RequireAuth>} />
         <Route path="/eod" element={<RequireAuth><EODFormPage /></RequireAuth>} />
         <Route path="/stats/:category" element={<RequireAuth><StatsPage /></RequireAuth>} />

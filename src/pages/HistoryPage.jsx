@@ -206,7 +206,7 @@ export default function HistoryPage() {
         label="Kopfschmerzen"
         dataByDate={dataByCategory.head}
         colors={HEAD_COLORS}
-        onDayPress={date => navigate(`/day/${date}`)}
+        onDayPress={date => navigate(`/day/${date}/head`)}
         earliestDate={earliest}
       />
 
@@ -214,7 +214,7 @@ export default function HistoryPage() {
         label="Unterleibsschmerzen"
         dataByDate={dataByCategory.abdomen}
         colors={ABDOMEN_COLORS}
-        onDayPress={date => navigate(`/day/${date}`)}
+        onDayPress={date => navigate(`/day/${date}/abdomen`)}
         earliestDate={earliest}
       />
 
