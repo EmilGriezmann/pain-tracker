@@ -23,5 +23,14 @@ export function useEntries() {
     if (error) throw error
   }
 
-  return { loadEntry, saveEntry }
+  async function loadAllEntries() {
+    const { data, error } = await supabase
+      .from('daily_entries')
+      .select('date, category, overall_pain')
+      .order('date', { ascending: true })
+    if (error) throw error
+    return data ?? []
+  }
+
+  return { loadEntry, saveEntry, loadAllEntries }
 }
