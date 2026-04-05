@@ -72,48 +72,33 @@ function HeatmapGrid({ days, dataByDate, colors, onDayPress }) {
   const today = new Date().toISOString().slice(0, 10)
 
   return (
-    <div className="flex gap-1">
-      {/* Wochentag-Labels */}
-      <div className="flex flex-col gap-1 pt-0.5">
+    <div className="flex flex-col gap-1">
+      {/* Wochentag-Labels oben */}
+      <div className="flex gap-1">
         {DAY_LABELS.map(d => (
-          <div key={d} className="h-7 flex items-center text-[10px] text-gray-400 w-5">{d}</div>
+          <div key={d} className="w-8 text-center text-[10px] text-gray-400">{d}</div>
         ))}
       </div>
 
-      {/* Spalten = Wochen */}
-      <div className="flex gap-1 overflow-x-auto flex-1">
-        {weeks.map((week, wi) => (
-          <div key={wi} className="flex flex-col gap-1">
-            {week.map(date => {
-              const pain = dataByDate[date] ?? null
-              const color = getColor(pain, colors)
-              const isToday = date === today
-              return (
-                <button
-                  key={date}
-                  onClick={() => onDayPress(date)}
-                  style={{ backgroundColor: color }}
-                  className={`w-7 h-7 rounded-md flex-shrink-0 ${isToday ? 'ring-2 ring-offset-1 ring-gray-400' : ''}`}
-                  title={date}
-                />
-              )
-            })}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// Legende
-function Legend({ colors, label }) {
-  return (
-    <div className="flex items-center gap-1 mt-2">
-      <span className="text-[10px] text-gray-400 mr-1">weniger</span>
-      {[0, 2, 4, 6, 8, 10].map(i => (
-        <div key={i} className="w-4 h-4 rounded-sm" style={{ backgroundColor: colors[i] }} />
+      {/* Zeilen = Wochen */}
+      {weeks.map((week, wi) => (
+        <div key={wi} className="flex gap-1">
+          {week.map(date => {
+            const pain = dataByDate[date] ?? null
+            const color = getColor(pain, colors)
+            const isToday = date === today
+            return (
+              <button
+                key={date}
+                onClick={() => onDayPress(date)}
+                style={{ backgroundColor: color }}
+                className={`w-8 h-8 rounded-md flex-shrink-0 ${isToday ? 'ring-2 ring-offset-1 ring-gray-400' : ''}`}
+                title={date}
+              />
+            )
+          })}
+        </div>
       ))}
-      <span className="text-[10px] text-gray-400 ml-1">mehr</span>
     </div>
   )
 }
@@ -162,7 +147,6 @@ export default function HistoryPage() {
           colors={HEAD_COLORS}
           onDayPress={date => navigate(`/day/${date}`)}
         />
-        <Legend colors={HEAD_COLORS} />
       </div>
 
       {/* Unterleibsschmerzen */}
@@ -174,7 +158,6 @@ export default function HistoryPage() {
           colors={ABDOMEN_COLORS}
           onDayPress={date => navigate(`/day/${date}`)}
         />
-        <Legend colors={ABDOMEN_COLORS} />
       </div>
 
       {/* Ausklappen / Einklappen */}
