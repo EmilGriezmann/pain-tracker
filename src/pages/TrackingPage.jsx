@@ -78,7 +78,7 @@ export default function TrackingPage() {
       </p>
 
       {/* Canvas */}
-      <div className="px-4">
+      <div>
         <PainCanvas
           key={category}
           initialData={savedData[category] ?? []}

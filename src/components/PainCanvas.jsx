@@ -201,8 +201,8 @@ export default function PainCanvas({ initialData = [], onChange, readOnly = fals
     <div className="flex flex-col gap-2">
       <canvas
         ref={canvasRef}
-        className="w-full rounded-xl border border-gray-200 touch-none"
-        style={{ aspectRatio: '2 / 1' }}
+        className="w-full touch-none"
+        style={{ aspectRatio: '3 / 4' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
