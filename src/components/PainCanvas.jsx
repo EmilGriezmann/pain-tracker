@@ -202,7 +202,7 @@ export default function PainCanvas({ initialData = [], onChange, readOnly = fals
       <canvas
         ref={canvasRef}
         className="w-full rounded-xl border border-gray-200 touch-none"
-        style={{ aspectRatio: '3 / 1' }}
+        style={{ aspectRatio: '2 / 1' }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
