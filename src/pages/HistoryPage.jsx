@@ -36,7 +36,9 @@ function getMonthsInRange(startMonthStr, endMonthStr) {
   const cur = new Date(startMonthStr + '-01')
   const end = new Date(endMonthStr + '-01')
   while (cur <= end) {
-    months.push(cur.toISOString().slice(0, 7))
+    const y = cur.getFullYear()
+    const m = String(cur.getMonth() + 1).padStart(2, '0')
+    months.push(`${y}-${m}`)
     cur.setMonth(cur.getMonth() + 1)
   }
   return months
