@@ -48,13 +48,20 @@ Zuletzt aktualisiert: 2026-04-05
 - `src/components/NavBar.jsx` — Bottom Navigation (Heute / Verlauf / Abend)
 - NavBar in alle drei Seiten eingebunden
 
+### Schritt 7 — PWA & Deployment
+- Icons erstellt: `public/icons/icon-192.png`, `icon-512.png`, `apple-touch-icon.png` (aus hochgeladenem JPG via sips)
+- `.npmrc` mit `legacy-peer-deps=true` für Vercel-Kompatibilität
+- GitHub-Repository angelegt: https://github.com/EmilGriezmann/pain-tracker
+- Vercel-Deployment aktiv (automatische Deploys bei Push auf `main`)
+- Canvas-Größe angepasst: kein Rahmen, volle Breite, Aspect Ratio 1:1
+
 ---
 
 ## Offene Schritte
 
-- [ ] Schritt 7 — PWA & Deployment (Icons, Vercel)
-- [ ] Schritt 8 — Design (Farben, Icons, Schrift)
-- [ ] Begleitsymptome-Optionen definieren
+- [ ] Schritt 8 — Design (Farben, App-Icon, Schrift)
+- [ ] Begleitsymptome-Optionen definieren (Kopf + Unterbauch)
+- [ ] App auf iPhone als PWA installieren und Homescreen-Icon prüfen
 
 ---
 
@@ -64,7 +71,12 @@ Zuletzt aktualisiert: 2026-04-05
 sarah_app/
 ├── public/
 │   ├── favicon.svg
-│   └── icons.svg
+│   ├── icon-512.jpg          # Originalicon (hochgeladen)
+│   ├── icons.svg
+│   └── icons/
+│       ├── apple-touch-icon.png  (180x180)
+│       ├── icon-192.png          (192x192)
+│       └── icon-512.png          (512x512)
 ├── src/
 │   ├── main.jsx
 │   ├── App.jsx               # Router + Auth-Guard
@@ -87,6 +99,7 @@ sarah_app/
 ├── STATUS.md
 ├── CLAUDE.md
 ├── .env.local
+├── .npmrc
 ├── vite.config.js
 ├── index.html
 └── package.json
@@ -96,7 +109,6 @@ sarah_app/
 
 ## Bekannte Besonderheiten
 
-- `vite-plugin-pwa` mit `--legacy-peer-deps` installiert (Vite 8 Kompatibilitätsproblem)
-- Keine Icons unter `public/icons/` — werden in Schritt 7/8 ergänzt
-- Begleitsymptome-Optionen noch nicht definiert
+- `vite-plugin-pwa` mit `--legacy-peer-deps` installiert (Vite 8 Kompatibilitätsproblem) — `.npmrc` sorgt dafür, dass Vercel dasselbe tut
+- Null-Slots (nicht gezeichnete Stunden) werden nicht gespeichert; Wert 0 wird explizit gespeichert — beides korrekt unterschieden
 - Account-Erstellung nur über Supabase Dashboard (kein öffentliches Registrierungsformular)
