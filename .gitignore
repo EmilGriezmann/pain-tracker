@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Lokale Scripts (können Secrets enthalten)
+scripts/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
