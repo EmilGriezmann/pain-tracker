@@ -88,6 +88,13 @@ Zuletzt aktualisiert: 2026-04-06
 - Erscheinen in EOD-Eingabe und Statistiken
 - Gespeichert in neuer Supabase-Tabelle `user_symptoms` (user_id, category, value, label)
 
+### Schritt 13 — Daten-Export als Markdown (nächste Session)
+
+Export-Button (Ort noch offen) erzeugt eine `.md`-Datei zum Download mit:
+- Kurzbeschreibung der App und was die Felder bedeuten (Kontext für KI)
+- Allen eingetragenen Einträgen (Datum, Kategorie, Gesamtschmerz, Ort, Charakter, Begleitsymptome, Kurven-Zusammenfassung)
+- Ziel: Datei direkt an ChatGPT o.ä. übergeben für Empfehlungen / Musteranalyse
+
 ### Weitere offene Punkte
 - [ ] Design-Schritt (App-Name, Schrift, Feintuning)
 
