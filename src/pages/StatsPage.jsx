@@ -37,8 +37,7 @@ function countValues(entries, field, labelMap) {
     .sort((a, b) => b[1] - a[1])
 }
 
-function FrequencySection({ title, counts }) {
-  const max = counts[0]?.[1] ?? 1
+function FrequencySection({ title, counts, period }) {
 
   if (counts.length === 0) {
     return (
@@ -59,7 +58,7 @@ function FrequencySection({ title, counts }) {
             <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
               <div
                 className="h-2 rounded-full bg-indigo-400"
-                style={{ width: `${(count / max) * 100}%` }}
+                style={{ width: `${(count / period) * 100}%` }}
               />
             </div>
             <span className="text-sm text-gray-500 w-6 text-right flex-shrink-0">{count}</span>
@@ -119,9 +118,9 @@ export default function StatsPage() {
         <p className="text-xs text-gray-400 mb-4">
           {entries.length} Einträge in den letzten {period} Tagen
         </p>
-        <FrequencySection title="Ort" counts={locationCounts} />
-        <FrequencySection title="Charakter" counts={characterCounts} />
-        <FrequencySection title="Begleitsymptome" counts={symptomCounts} />
+        <FrequencySection title="Ort" counts={locationCounts} period={period} />
+        <FrequencySection title="Charakter" counts={characterCounts} period={period} />
+        <FrequencySection title="Begleitsymptome" counts={symptomCounts} period={period} />
       </div>
 
       <NavBar />
